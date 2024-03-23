@@ -1,20 +1,38 @@
-import { Typography } from "@mui/material";
+import { Typography, useMediaQuery } from "@mui/material";
 import moment from "moment";
 import CustomBox from "./shared/box";
-import { useSelector } from "react-redux";
 
 export default function Order({ order }) {
-  //   const orderList = useSelector((state) => state.order);
-
-  //   const currentOrder = orderList.find((o) => o.name === order.name);
+  const matches = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   return (
-    <CustomBox>
+    <CustomBox active={Boolean(order.bot)}>
       <div style={{ position: "relative" }}>
-        <Typography variant="body1">{order.name}</Typography>
+        <Typography
+          variant="body1"
+          style={{ fontSize: matches ? "1rem" : "13px" }}
+        >
+          {order.name}
+        </Typography>
+
         <Typography style={{ fontSize: 12 }}>
           {moment(order.createdOn).format("hh:mm:ss A")}
         </Typography>
+
+        {order.startOn && (
+          <>
+            <Typography style={{ fontSize: 12, fontWeight: "bold" }}>
+              RUNNING :{" "}
+              <br
+              // style={{ display: matches ? "none" : "inline" }}
+              />
+              {order.bot.name}
+            </Typography>
+            <Typography style={{ fontSize: 12 }}>
+              {moment(order.startOn).format("hh:mm:ss A")}
+            </Typography>
+          </>
+        )}
 
         <div
           style={{

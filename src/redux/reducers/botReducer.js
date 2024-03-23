@@ -6,7 +6,6 @@ import {
   OFF_BOT,
   ON_BOT,
 } from "../constant";
-import { useSelector } from "react-redux";
 
 const defaultState = [];
 
@@ -14,8 +13,6 @@ export const botReducer = (
   state = defaultState,
   { type, payload = { bot: {}, order: {} } }
 ) => {
-  // const orderList = useSelector((state) => state.order);
-
   const { bot, order } = payload;
   switch (type) {
     case ADD_BOT:
@@ -37,7 +34,7 @@ export const botReducer = (
         prev.name === bot.name
           ? {
               ...prev,
-              currentOrder: { ...order, startOn: moment().toDate() },
+              currentOrder: { ...order, bot: prev, startOn: moment().toDate() },
             }
           : prev
       );

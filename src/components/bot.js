@@ -1,4 +1,4 @@
-import { Fab, Stack, Typography } from "@mui/material";
+import { Fab, Stack, Typography, styled } from "@mui/material";
 import CustomBox from "./shared/box";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,14 +7,21 @@ import { useEffect, useState } from "react";
 import { assignOrder, completeOrder } from "../redux/actions/order";
 import { store } from "../redux/store";
 
-const maxTime = 5;
+const maxTime = 10;
+
+const Root = styled("div")(({ theme }) => ({
+  [theme.breakpoints.down("xs")]: {
+    // width: "100%",
+  },
+  [theme.breakpoints.up("xs")]: {
+    minWidth: "280px",
+  },
+}));
 
 export default function Bot({ bot }) {
   const dispatch = useDispatch();
   const botList = useSelector((state) => state.bot);
   const orderList = useSelector((state) => state.order);
-  const executingList = useSelector((state) => state.executing);
-  const completedList = useSelector((state) => state.completed);
 
   const currentBot = botList.find((b) => b.name === bot.name);
 
@@ -96,7 +103,12 @@ export default function Bot({ bot }) {
             !Boolean(b.currentOrder)
         )
       ) {
-        const nextOrder = orderList[0];
+        let nextOrder = orderList.find(
+          (o) =>
+            o.bot === undefined &&
+            o.startOn === undefined &&
+            o.completeOn === undefined
+        );
 
         if (Boolean(nextOrder) && currentBot.active) {
           console.log("assign order");
@@ -109,43 +121,42 @@ export default function Bot({ bot }) {
         }
       }
     }
-  }, [botList, orderList, completedList, processing]);
-
-  console.log(processing);
-  console.log(countDown);
+  }, [botList, orderList, processing]);
 
   return (
-    <CustomBox
-      minHeight={30}
-      padding="10px 5px"
-      active={currentBot.active}
-      width="100%"
-    >
-      <Stack direction="row" alignItems="center" gap={1}>
-        <Fab
-          size="small"
-          style={{ height: 36, width: 36, backgroundColor: "white" }}
-          onClick={handleToggleActive}
-        >
-          <RadioButtonCheckedIcon height={10} style={{ color: "red" }} />
-        </Fab>
-        <Typography variant="body1">
-          {currentBot.name} :{" "}
-          <strong>{currentBot.currentOrder?.name ?? "-"}</strong>
-        </Typography>
-      </Stack>
-      <Typography
-        variant="body2"
-        style={{
-          color: "red",
-          position: "absolute",
-          right: 10,
-          bottom: 0,
-          visibility: Boolean(currentBot.currentOrder) ? "visible" : "hidden",
-        }}
+    <Root>
+      <CustomBox
+        minHeight={30}
+        padding="10px 5px"
+        active={currentBot.active}
+        width="inherit"
       >
-        Remaining : {countDown}
-      </Typography>
-    </CustomBox>
+        <Stack direction="row" alignItems="center" gap={1}>
+          <Fab
+            size="small"
+            style={{ height: 36, width: 36, backgroundColor: "white" }}
+            onClick={handleToggleActive}
+          >
+            <RadioButtonCheckedIcon height={10} style={{ color: "red" }} />
+          </Fab>
+          <Typography variant="body1">
+            {currentBot.name} :{" "}
+            <strong>{currentBot.currentOrder?.name ?? "-"}</strong>
+          </Typography>
+        </Stack>
+        <Typography
+          variant="body2"
+          style={{
+            color: "red",
+            position: "absolute",
+            right: 10,
+            bottom: 0,
+            visibility: Boolean(currentBot.currentOrder) ? "visible" : "hidden",
+          }}
+        >
+          Remaining : {countDown}
+        </Typography>
+      </CustomBox>
+    </Root>
   );
 }

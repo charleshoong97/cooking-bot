@@ -1,4 +1,4 @@
-import { Divider, Grid, Stack, Typography } from "@mui/material";
+import { Divider, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
 import "./App.css";
 import { useSelector } from "react-redux";
 import Bot from "./components/bot";
@@ -27,7 +27,9 @@ const customerList = [
 function App() {
   const orderList = useSelector((state) => state.order);
   const botList = useSelector((state) => state.bot);
-  const completedList = useSelector((state) => state.completed);
+
+  const matches = useMediaQuery((theme) => theme.breakpoints.up("sm"));
+  const matchesXS = useMediaQuery((theme) => theme.breakpoints.up("xs"));
 
   return (
     <Stack
@@ -53,12 +55,12 @@ function App() {
 
       <Divider flexItem orientation="vertical" />
 
-      <Stack
-        direction={"column"}
-        spacing={{ xs: 1, sm: 2 }}
-        style={{ minWidth: 280 }}
-      >
-        <Typography variant="h4" textAlign={"center"}>
+      <Stack direction={"column"} spacing={{ xs: 1, sm: 2 }}>
+        <Typography
+          variant="h4"
+          textAlign={"center"}
+          style={{ width: matchesXS ? "280px" : undefined }}
+        >
           Cooking Bot
         </Typography>
 
@@ -66,12 +68,17 @@ function App() {
           <Bot key={index} bot={bot} />
         ))}
       </Stack>
+      {/* <Divider variant="middle" /> */}
 
-      <Divider flexItem orientation="vertical" />
+      {matches ? (
+        <Divider flexItem orientation={"vertical"} />
+      ) : (
+        <Divider variant="middle" />
+      )}
 
       <Grid container>
-        <Grid item sm={5}>
-          <Typography variant="h4" textAlign={"center"}>
+        <Grid item xs={5}>
+          <Typography variant={matches ? "h4" : "h5"} textAlign={"center"}>
             Pending Order
           </Typography>
 
@@ -82,15 +89,17 @@ function App() {
               height: "fit-content",
             }}
           >
-            {orderList?.map((order, index) => (
-              <Grid key={index} item xs={12} xl={6}>
-                <Order key={index} order={order} />
-              </Grid>
-            ))}
+            {orderList
+              .filter((o) => o.completeOn === undefined)
+              ?.map((order, index) => (
+                <Grid key={index} item xs={12} xl={6}>
+                  <Order key={index} order={order} />
+                </Grid>
+              ))}
           </Grid>
         </Grid>
 
-        <Grid item sm={1} style={{ display: "contents" }}>
+        <Grid item xs={2} style={{ display: "grid" }}>
           <Divider
             flexItem
             variant="middle"
@@ -99,8 +108,8 @@ function App() {
           />
         </Grid>
 
-        <Grid item sm={5}>
-          <Typography variant="h4" textAlign={"center"}>
+        <Grid item xs={5}>
+          <Typography variant={matches ? "h4" : "h5"} textAlign={"center"}>
             Completed Order
           </Typography>
 
@@ -111,11 +120,14 @@ function App() {
               height: "fit-content",
             }}
           >
-            {completedList.map((order, index) => (
-              <Grid key={index} item xs={12} xl={6}>
-                <Completed key={index} completed={order} />
-              </Grid>
-            ))}
+            {orderList
+              .filter((o) => o.completeOn !== undefined)
+              .sort((a, b) => a.completeOn.getTime() - b.completeOn.getTime())
+              .map((order, index) => (
+                <Grid key={index} item xs={12} xl={6}>
+                  <Completed key={index} completed={order} />
+                </Grid>
+              ))}
           </Grid>
         </Grid>
       </Grid>

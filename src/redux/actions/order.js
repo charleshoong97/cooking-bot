@@ -1,9 +1,4 @@
-import {
-  ADD_ORDER,
-  ASSIGN_ORDER,
-  COMPLETE_ORDER,
-  EXECUTE_ORDER,
-} from "../constant";
+import { ADD_ORDER, ASSIGN_ORDER, COMPLETE_ORDER } from "../constant";
 
 export const addOrder = (payload) => ({
   type: ADD_ORDER,
@@ -17,10 +12,5 @@ export const assignOrder = (payload) => ({
 
 export const completeOrder = (payload) => ({
   type: COMPLETE_ORDER,
-  payload,
-});
-
-export const executeOrder = (payload) => ({
-  type: EXECUTE_ORDER,
   payload,
 });
